@@ -31,3 +31,12 @@ jobs:
     - name: Build Docker image
       run: |
         docker build -t vuln-app:latest .
+
+    - name: Run SCA Scan
+      run: |
+        docker run --rm \
+          -e ACCUKNOX_ENDPOINT=${{ secrets.ACCUKNOX_ENDPOINT }} \
+          -e ACCUKNOX_TOKEN=${{ secrets.ACCUKNOX_TOKEN }} \
+          -e ACCUKNOX_LABEL=${{ secrets.ACCUKNOX_LABEL }} \
+          -v ${{ github.workspace }}:/workspace \
+          gcshubham/sca-engine:v1
