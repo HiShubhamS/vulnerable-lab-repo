@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "main"
+
   pull_request:
 
 jobs:
@@ -34,10 +35,26 @@ jobs:
       - name: Run AccuKnox SCA Scan
         run: |
           docker run --rm \
-            -e ACCUKNOX_ENDPOINT=${{ secrets.ACCUKNOX_ENDPOINT }} \
-            -e ACCUKNOX_TOKEN=${{ secrets.ACCUKNOX_TOKEN }} \
-            -e ACCUKNOX_LABEL=${{ secrets.ACCUKNOX_LABEL }} \
-            -e GITHUB_REPOSITORY=${{ github.repository }} \
-            -e GITHUB_REF_NAME=${{ github.ref_name }} \
-            -v ${{ github.workspace }}:/workspace \
+            -e ACCUKNOX_ENDPOINT="${{ secrets.ACCUKNOX_ENDPOINT }}" \
+            -e ACCUKNOX_TOKEN="${{ secrets.ACCUKNOX_TOKEN }}" \
+            -e ACCUKNOX_LABEL="${{ secrets.ACCUKNOX_LABEL }}" \
+            -e GITHUB_REPOSITORY="${{ github.repository }}" \
+            -e GITHUB_REF_NAME="${{ github.ref_name }}" \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
             gcshubham/sca-engine:v7
+
+  sast-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@main
+
+      - name: Run AccuKnox SAST Scan
+        uses: accuknox/sast-scan-opengrep-action@main
+        with:
+          accuknox_endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
+          accuknox_token: ${{ secrets.ACCUKNOX_TOKEN }}
+          accuknox_label: ${{ secrets.ACCUKNOX_LABEL }}
+          soft_fail: true
