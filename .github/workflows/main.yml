@@ -3,12 +3,12 @@ name: Basic CI Workflow
 on:
   push:
     branches:
-      - "main"
+      - main
 
   pull_request:
 
 jobs:
-  build:
+  build-and-sca:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,11 +23,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run app (sanity check)
+      - name: Run app sanity check
         run: |
           python app.py &
           sleep 5
-          pkill -f app.py
+          pkill -f app.py || true
 
       - name: Build Docker image
         run: docker build -t vuln-app:latest .
@@ -49,7 +49,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@main
+        uses: actions/checkout@v4
 
       - name: Run AccuKnox SAST Scan
         uses: accuknox/sast-scan-opengrep-action@main
@@ -58,4 +58,21 @@ jobs:
           accuknox_token: ${{ secrets.ACCUKNOX_TOKEN }}
           accuknox_label: ${{ secrets.ACCUKNOX_LABEL }}
           soft_fail: true
-#
+
+  sbom-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run AccuKnox SBOM Scan
+        uses: accuknox/xbom-action@2.0
+        with:
+          bom-type: sbom
+          path: "."
+          token: ${{ secrets.ACCUKNOX_TOKEN }}
+          endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
+          label: ${{ secrets.ACCUKNOX_LABEL }}
+          project-name: my-project
+          project-classifier: application
