@@ -74,5 +74,5 @@ jobs:
           token: ${{ secrets.ACCUKNOX_TOKEN }}
           endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
           label: ${{ secrets.ACCUKNOX_LABEL }}
-          project-name: my-project
+          project-name: ssbom
           project-classifier: application
