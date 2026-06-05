@@ -11,8 +11,6 @@ jobs:
   build-and-sca:
     runs-on: ubuntu-latest
 
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -49,8 +47,6 @@ jobs:
   sast-scan:
     runs-on: ubuntu-latest
 
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -66,13 +62,11 @@ jobs:
   sbom-scan:
     runs-on: ubuntu-latest
 
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run AccuKnox Source SBOM Scan
+      - name: Run AccuKnox SBOM Scan
         uses: accuknox/xbom-action@2.0
         with:
           bom-type: sbom
@@ -82,24 +76,3 @@ jobs:
           label: ${{ secrets.ACCUKNOX_LABEL }}
           project-name: my-project
           project-classifier: application
-          output-file: source-sbom.json
-
-      - name: Build image
-        id: build
-        run: |
-          IMAGE="myapp:${{ github.sha }}"
-          docker build -t "$IMAGE" .
-          echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
-
-      - name: Run AccuKnox Container SBOM Scan
-        uses: accuknox/xbom-action@2.0
-        continue-on-error: true
-        with:
-          bom-type: sbom
-          image: ${{ steps.build.outputs.image }}
-          token: ${{ secrets.ACCUKNOX_TOKEN }}
-          endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
-          label: ${{ secrets.ACCUKNOX_LABEL }}
-          project-name: my-project
-          project-classifier: container
-          output-file: container-sbom.json
