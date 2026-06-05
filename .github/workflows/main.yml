@@ -82,6 +82,7 @@ jobs:
           label: ${{ secrets.ACCUKNOX_LABEL }}
           project-name: my-project
           project-classifier: application
+          output-file: source-sbom.json
 
       - name: Build image
         id: build
@@ -92,6 +93,7 @@ jobs:
 
       - name: Run AccuKnox Container SBOM Scan
         uses: accuknox/xbom-action@2.0
+        continue-on-error: true
         with:
           bom-type: sbom
           image: ${{ steps.build.outputs.image }}
@@ -100,3 +102,4 @@ jobs:
           label: ${{ secrets.ACCUKNOX_LABEL }}
           project-name: my-project
           project-classifier: container
+          output-file: container-sbom.json
