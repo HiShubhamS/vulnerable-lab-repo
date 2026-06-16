@@ -57,8 +57,8 @@ jobs:
           accuknox_endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
           accuknox_token: ${{ secrets.ACCUKNOX_TOKEN }}
           accuknox_label: ${{ secrets.ACCUKNOX_LABEL }}
-          soft_fail: true
-          severity : Medium
+          soft_fail: "true"
+          severity : "Medium"
 
   sbom-scan:
     runs-on: ubuntu-latest
